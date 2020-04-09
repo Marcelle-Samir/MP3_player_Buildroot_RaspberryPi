@@ -1,0 +1,36 @@
+#!/bin/sh
+
+DAEMON1="/myApplications/audio_player.sh"
+test -f ${DAEMON1} || exit 0
+
+startdaemon1(){
+  modprobe snd-bcm2835 #This will wire up the sound card with alsa
+  start-stop-daemon -b --start --quiet --exec ${DAEMON1}
+  echo "${DAEMON1} started."
+}
+
+stopdaemon1(){
+  start-stop-daemon --stop --quiet --exec ${DAEMON1}
+  echo "${DAEMON1} stopped."
+}
+
+case "$1" in
+  start)
+	startdaemon1
+      ;;
+  stop)
+	stopdaemon1
+      ;;
+  force-reload)
+	stopdaemon1
+	startdaemon1
+      ;;
+  restart)
+	stopdaemon1
+	startdaemon1
+      ;;
+  *)
+      echo "Usage: $0 { start | stop | restart}" >&2
+      exit 1
+      ;;
+esac

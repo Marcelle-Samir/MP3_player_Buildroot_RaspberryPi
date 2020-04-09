@@ -1,0 +1,36 @@
+#!/bin/sh
+
+DAEMON2="/myApplications/USB_detect.sh"
+test -f ${DAEMON2} || exit 0
+
+startdaemon2(){
+  modprobe snd-bcm2835 #This will wire up the sound card with alsa
+  start-stop-daemon -b --start --quiet --exec ${DAEMON2}
+  echo "${DAEMON2} started."
+}
+
+stopdaemon2(){
+  start-stop-daemon --stop --quiet --exec ${DAEMON2}
+  echo "${DAEMON2} stopped."
+}
+
+case "$1" in
+  start)
+	startdaemon2
+      ;;
+  stop)
+	stopdaemon2
+      ;;
+  force-reload)
+	stopdaemon2
+	startdaemon2
+      ;;
+  restart)
+	stopdaemon2
+	startdaemon2
+      ;;
+  *)
+      echo "Usage: $0 { start | stop | restart}" >&2
+      exit 1
+      ;;
+esac
