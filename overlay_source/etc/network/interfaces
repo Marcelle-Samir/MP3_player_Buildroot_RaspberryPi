@@ -12,3 +12,11 @@ hostname $(hostname)
 address 192.168.1.6
 netmask 255.255.255.0
 
+auto wlan0
+iface wlan0 inet static
+   wait-delay 30
+   pre-up wpa_supplicant -B -Dwext -iwlan0 -c /etc/wpa_supplicant/wpa_supplicant.conf
+   post-down killall -q wpa_supplicant
+   address 192.168.1.30
+   netmask 255.255.255.0
+   gateway 192.168.1.1
