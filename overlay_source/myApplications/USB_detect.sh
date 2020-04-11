@@ -2,16 +2,15 @@
 
 touch /myApplications/nousb.txt 
 touch /myApplications/withusb.txt
-#touch /myApplications/USBData.txt
+touch /myApplications/no_of_songs_system.txt
 
 chmod 777 /myApplications/nousb.txt 
 chmod 777 /myApplications/withusb.txt
-
+chmod 777 /myApplications/no_of_songs_system.txt
 chmod 777 /myApplications/songsList.txt
 
-no_of_songs_system=$(sudo find / -name "*.mp3" | wc -l)
-
-espeak -g15 -s130 -ven-us+f1 "You have $no_of_songs_system mp3 songs on SD Card of Raspberry pi" 2>/dev/null
+no_of_songs_system=$(find / -name "*.mp3" | wc -l)
+echo $no_of_songs_system > /myApplications/no_of_songs_system.txt
 
 fdisk -l /dev/sd* | grep -v 'Unknown' | grep -v 'Empty' | awk '/^\/dev\/sd/ {print $1}' > /myApplications/nousb.txt
 fdisk -l /dev/sd* | grep -v 'Unknown' | grep -v 'Empty' | awk '/^\/dev\/sd/ {print $1}' > /myApplications/withusb.txt
@@ -28,6 +27,7 @@ while true; do
 			mountpoint="/media/$(basename $partition)"
 			mkdir -p $mountpoint
 			mount $partition $mountpoint
+			espeak -g15 -s130 -ven-us+f1 "new storage device is added" --stdout | aplay
 		done
 
 		find $mountpoint -name "*.mp3" | wc -l > /myApplications/usb_songs_num.txt
@@ -38,4 +38,8 @@ while true; do
 		diff nousb.txt withusb.txt > /dev/null
 	done
 	fdisk -l /dev/sd* | grep -v 'Unknown' | grep -v 'Empty' | awk '/^\/dev\/sd/ {print $1}' > /myApplications/nousb.txt
+	if [[ partitions -eq 0 ]]
+	then
+		espeak -g15 -s130 -ven-us+f1 "new storage device is removed" --stdout | aplay
+	fi
 done
