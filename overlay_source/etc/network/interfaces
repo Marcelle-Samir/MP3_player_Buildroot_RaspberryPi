@@ -4,13 +4,17 @@ auto lo
 iface lo inet loopback
 
 #iface eth0 inet dhcp
+wait-delay 30
 auto eth0
 iface eth0 inet static
 pre-up /etc/network/nfs_check
 wait-delay 15
 hostname $(hostname)
-address 192.168.1.6
-netmask 255.255.255.0
+   address 192.168.5.30
+   netmask 255.255.255.0
+   gateway 192.168.5.1
+
+### WiFi adapter ###
 
 auto wlan0
 iface wlan0 inet static

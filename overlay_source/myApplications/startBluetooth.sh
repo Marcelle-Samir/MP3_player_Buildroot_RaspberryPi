@@ -8,10 +8,7 @@ sleep 2
 sleep 2
 hciconfig hci0 up
 sleep 2
-bluetoothctl
-agent on
-default-agent
-pair 01:01:01:01:07:99
-trust 01:01:01:01:07:99
-connect 01:01:01:01:07:99
+bluetoothctl pair 01:01:01:01:07:99
+bluetoothctl connect 01:01:01:01:07:99
+bluetoothctl trust 01:01:01:01:07:99
 quit
