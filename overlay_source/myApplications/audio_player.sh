@@ -57,7 +57,7 @@ do
 		if [[ $pause_play_flag -eq 0 ]]
 		then		
 			# stop the running song  
-			killall -STOP mpv
+			killall -STOP play
 			# set the pause_play_flag, because now there's a stopped song 
 			pause_play_flag=1
 			# this only for debugging 
@@ -65,7 +65,7 @@ do
 		elif [[ $pause_play_flag -eq 1 ]]		
 		then	
 			# return the stoped song to the background	
-			killall -CONT mpv
+			killall -CONT play
 			# clear the pause_play_flag, because the isn't stopped songs anymore
 			pause_play_flag=0
 			# this only for debugging 
@@ -74,13 +74,13 @@ do
 		elif [[ $pause_play_flag -eq 2 ]]		
 		then
 			# end any running process 
-			killall -15 mpv
+			killall -15 play
 			# set the song_count to the initial value to play the first song in the songsList.txt
 			song_count=1
 			# pick the song name from the list to be played according to the song_count value
 			next_song=`sed -n "$song_count{p;q}" /myApplications/songsList.txt`
 			# run the song in the background
-			mpv $next_song &	
+			play -q $next_song &
 			# make sure that the pause_play_flag is cleared
 			pause_play_flag=0
 			# this only for debugging
@@ -95,7 +95,7 @@ do
 		if [[ $pause_play_flag -eq 0 ]]
 		then		
 			# stop the running song  
-			killall -STOP mpv
+			killall -STOP play
 			# set the pause_play_flag, because now there's a stopped song 
 			pause_play_flag=1
 			# this only for debugging 
@@ -103,7 +103,7 @@ do
 		elif [[ $pause_play_flag -eq 1 ]]		
 		then	
 			# return the stoped song to the background	
-			killall -CONT mpv
+			killall -CONT play
 			# clear the pause_play_flag, because the isn't stopped songs anymore
 			pause_play_flag=0
 			# this only for debugging 
@@ -112,13 +112,13 @@ do
 		elif [[ $pause_play_flag -eq 2 ]]		
 		then
 			# end any running process 
-			killall -15 mpv
+			killall -15 play
 			# set the song_count to the initial value to play the first song in the songsList.txt
 			song_count=1
 			# pick the song name from the list to be played according to the song_count value
 			next_song=`sed -n "$song_count{p;q}" /myApplications/songsList.txt`
 			# run the song in the background
-			mpv $next_song &	
+			play -q $next_song &
 			# make sure that the pause_play_flag is cleared
 			pause_play_flag=0
 			# this only for debugging
@@ -134,7 +134,7 @@ do
 	if [[ $(cat /sys/class/gpio/gpio5/value) -eq 1 ]]
 	then
 		# end any running process 
-		killall -15 mpv
+		killall -15 play
 		if [[ $song_count -lt $total_songs_num ]]
 		then
 			# incrementing the song_count to select the next song in songsList.txt
@@ -154,7 +154,7 @@ do
 			echo "nextcountElse= $song_count" >> /myApplications/debug.txt	
 		fi		
 		# run the song in the background
-		mpv $next_song &
+		play -q $next_song &
 		# make sure that the pause_play_flag is cleared
 		pause_play_flag=0
 		# to avoid button debouncing 
@@ -163,7 +163,7 @@ do
 	elif [[ "$next_button" -eq 1 ]]
 	then
 		# end any running process 
-		killall -15 mpv
+		killall -15 play
 		if [[ $song_count -lt $total_songs_num ]]
 		then
 			# incrementing the song_count to select the next song in songsList.txt
@@ -183,7 +183,7 @@ do
 			echo "nextcountElse= $song_count" >> /myApplications/debug.txt	
 		fi		
 		# run the song in the background
-		mpv $next_song &
+		play -q $next_song &
 		# make sure that the pause_play_flag is cleared
 		pause_play_flag=0
 		echo "0" > /myApplications/next_button.txt
@@ -195,7 +195,7 @@ do
 	if [[ $(cat /sys/class/gpio/gpio6/value) -eq 1 ]]
 	then
 		# end any running process 
-		killall -15 mpv
+		killall -15 play
 		if [[ $song_count -gt 1 ]]
 		then
 			# decrementing the song_count to select the next song in songsList.txt
@@ -215,7 +215,7 @@ do
 			echo "prevcountElse= $song_count" >> /myApplications/debug.txt
 		fi	
 		# run the song in the background
-		mpv $next_song &
+		play -q $next_song &
 		# make sure that the pause_play_flag is cleared
 		pause_play_flag=0
 		# this only for debugging 
@@ -227,7 +227,7 @@ do
 	elif [[ "$prev_button" -eq 1 ]]
 	then
 		# end any running process 
-		killall -15 mpv
+		killall -15 play
 		if [[ $song_count -gt 1 ]]
 		then
 			# decrementing the song_count to select the next song in songsList.txt
@@ -247,7 +247,7 @@ do
 			echo "prevcountElse= $song_count" >> /myApplications/debug.txt
 		fi	
 		# run the song in the background
-		mpv $next_song &
+		play -q $next_song &
 		# make sure that the pause_play_flag is cleared
 		pause_play_flag=0
 		# this only for debugging 
@@ -261,16 +261,11 @@ do
 	# shuffle button is pressed
 	if [[ $(cat /sys/class/gpio/gpio16/value) -eq 1 ]]
 	then
-		temp_count=0
-		while [[ $temp_count -lt $total_songs_num ]]
-		do
-		temp_count=$((temp_count+1))
-		temp_song=`sed -n "$temp_count{p;q}" /myApplications/songsList.txt`
-		songs_arr="$songs_arr $temp_song"
-		done
+		random_song=$((RANDOM%total_songs_num+1))			
+		next_song=`sed -n "$random_song{p;q}" /myApplications/songsList.txt`
 		# end any running process 
-		killall -15 mpv
-		mpv --shuffle $songs_arr &	
+		killall -15 play
+		play -q $next_song &
 		# make sure that the pause_play_flag is cleared
 		pause_play_flag=0
 		# this only for debugging
@@ -281,16 +276,11 @@ do
 		sleep 0.5
 	elif [[ "$shuffle_button" -eq 1 ]]
 	then
-		temp_count=0
-		while [[ $temp_count -lt $total_songs_num ]]
-		do
-		temp_count=$((temp_count+1))
-		temp_song=`sed -n "$temp_count{p;q}" /myApplications/songsList.txt`
-		songs_arr="$songs_arr $temp_song"
-		done
+		random_song=$((RANDOM%total_songs_num+1))			
+		next_song=`sed -n "$random_song{p;q}" /myApplications/songsList.txt`			
 		# end any running process 
-		killall -15 mpv
-		mpv --shuffle $songs_arr &	
+		killall -15 play
+		play -q $next_song &
 		# make sure that the pause_play_flag is cleared
 		pause_play_flag=0
 		# this only for debugging

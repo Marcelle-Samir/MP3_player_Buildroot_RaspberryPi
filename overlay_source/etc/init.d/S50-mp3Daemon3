@@ -1,0 +1,36 @@
+#!/bin/sh
+
+DAEMON3="/myApplications/output_selector.sh"
+test -f ${DAEMON3} || exit 0
+
+startdaemon3(){
+#  modprobe snd-bcm2835 #This will wire up the sound card with alsa
+  start-stop-daemon -b --start --quiet --exec ${DAEMON3}
+  echo "${DAEMON3} started."
+}
+
+stopdaemon3(){
+  start-stop-daemon --stop --quiet --exec ${DAEMON3}
+  echo "${DAEMON3} stopped."
+}
+
+case "$1" in
+  start)
+	startdaemon3
+      ;;
+  stop)
+	stopdaemon3
+      ;;
+  force-reload)
+	stopdaemon3
+	startdaemon3
+      ;;
+  restart)
+	stopdaemon3
+	startdaemon3
+      ;;
+  *)
+      echo "Usage: $0 { start | stop | restart}" >&2
+      exit 1
+      ;;
+esac
