@@ -1,6 +1,6 @@
 #!/bin/sh
+sed -i "/^pulse-access:x:[[:digit:]]*:pulse$/ s/$/,root/" /etc/group 2&> /dev/null 
 while true; do
-
 	tvservice_value=`tvservice -n | grep -c HDMI`
 	bluetooth_status=`bluetoothctl info | grep -c "Connected"`
 

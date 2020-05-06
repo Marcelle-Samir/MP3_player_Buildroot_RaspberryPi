@@ -41,7 +41,7 @@ pause_play_flag=2
 total_songs_num=`cat /myApplications/songsList.txt | wc -l`
 # set an initial value to song_cont
 song_count=0
-
+echo "nothing played" > /myApplications/song_status.txt
 while :
 do
 	total_songs_num=`cat /myApplications/songsList.txt | wc -l`
@@ -52,7 +52,7 @@ do
 	shuffle_button=`sed -n "1{p;q}" /myApplications/shuffle_button.txt`
 
 	# play/pause button is pressed case 
-	if [[ $(cat /sys/class/gpio/gpio26/value) -eq 1 ]]
+	if [[ $(cat /sys/class/gpio/gpio26/value) -eq 1 ]] ||  [[ "$play_pause_button" -eq 1 ]]
 	then
 		if [[ $pause_play_flag -eq 0 ]]
 		then		
@@ -60,55 +60,20 @@ do
 			killall -STOP play
 			# set the pause_play_flag, because now there's a stopped song 
 			pause_play_flag=1
-			# this only for debugging 
-			echo "song paused" >> /myApplications/debug.txt
-		elif [[ $pause_play_flag -eq 1 ]]		
-		then	
-			# return the stoped song to the background	
-			killall -CONT play
-			# clear the pause_play_flag, because the isn't stopped songs anymore
-			pause_play_flag=0
-			# this only for debugging 
-			echo "song replayed" >> /myApplications/debug.txt		
-		
-		elif [[ $pause_play_flag -eq 2 ]]		
-		then
-			# end any running process 
-			killall -15 play
-			# set the song_count to the initial value to play the first song in the songsList.txt
-			song_count=1
-			# pick the song name from the list to be played according to the song_count value
+			# this only for displaying songs name
 			next_song=`sed -n "$song_count{p;q}" /myApplications/songsList.txt`
-			# run the song in the background
-			play -q $next_song &
-			# make sure that the pause_play_flag is cleared
-			pause_play_flag=0
-			# this only for debugging
-			echo "startsong= $next_song" >> /myApplications/debug.txt
-			echo "startcount= $song_count" >> /myApplications/debug.txt
-		fi
-		# to avoid button debouncing 
-		sleep 0.5	
+			echo "MP3 Paused > $next_song" > /myApplications/song_status.txt
 
-	elif [[ "$play_pause_button" -eq 1 ]]
-	then
-		if [[ $pause_play_flag -eq 0 ]]
-		then		
-			# stop the running song  
-			killall -STOP play
-			# set the pause_play_flag, because now there's a stopped song 
-			pause_play_flag=1
-			# this only for debugging 
-			echo "song paused" >> /myApplications/debug.txt
 		elif [[ $pause_play_flag -eq 1 ]]		
 		then	
 			# return the stoped song to the background	
 			killall -CONT play
 			# clear the pause_play_flag, because the isn't stopped songs anymore
 			pause_play_flag=0
-			# this only for debugging 
-			echo "song replayed" >> /myApplications/debug.txt		
-		
+			# this only for displaying songs name	
+			next_song=`sed -n "$song_count{p;q}" /myApplications/songsList.txt`
+			echo "MP3 Playing > $next_song" > /myApplications/song_status.txt
+
 		elif [[ $pause_play_flag -eq 2 ]]		
 		then
 			# end any running process 
@@ -121,46 +86,17 @@ do
 			play -q $next_song &
 			# make sure that the pause_play_flag is cleared
 			pause_play_flag=0
-			# this only for debugging
-			echo "startsong= $next_song" >> /myApplications/debug.txt
-			echo "startcount= $song_count" >> /myApplications/debug.txt
+			# this only for displaying songs name	
+			echo "MP3 Playing > $next_song" > /myApplications/song_status.txt
+
 		fi
 		echo "0" > /myApplications/play_pause_button.txt
 		# to avoid button debouncing 
-		sleep 0.5	
+		sleep 0.5		
 	fi
 
 	# next song button is pressed
-	if [[ $(cat /sys/class/gpio/gpio5/value) -eq 1 ]]
-	then
-		# end any running process 
-		killall -15 play
-		if [[ $song_count -lt $total_songs_num ]]
-		then
-			# incrementing the song_count to select the next song in songsList.txt
-			song_count=$((song_count+1))
-			# pick the song name from the list to be played according to the song_count value
-			next_song=`sed -n "$song_count{p;q}" /myApplications/songsList.txt`	
-			# this only for debugging 
-			echo "nextsongIf= $next_song" >> /myApplications/debug.txt
-			echo "nextcountIf= $song_count" >> /myApplications/debug.txt	
-		else
-			# reset the song_count to start the list from the first song  
-			song_count=1
-			# pick the song name from the list to be played according to the song_count value
-			next_song=`sed -n "$song_count{p;q}" /myApplications/songsList.txt`	
-			# this only for debugging 
-			echo "nextsongElse= $next_song" >> /myApplications/debug.txt
-			echo "nextcountElse= $song_count" >> /myApplications/debug.txt	
-		fi		
-		# run the song in the background
-		play -q $next_song &
-		# make sure that the pause_play_flag is cleared
-		pause_play_flag=0
-		# to avoid button debouncing 
-		sleep 0.5
-
-	elif [[ "$next_button" -eq 1 ]]
+	if [[ $(cat /sys/class/gpio/gpio5/value) -eq 1 ]] || [[ "$next_button" -eq 1 ]]
 	then
 		# end any running process 
 		killall -15 play
@@ -187,12 +123,14 @@ do
 		# make sure that the pause_play_flag is cleared
 		pause_play_flag=0
 		echo "0" > /myApplications/next_button.txt
+		# this only for displaying songs name	
+		echo "MP3 Playing > $next_song" > /myApplications/song_status.txt
 		# to avoid button debouncing 
 		sleep 0.5
 	fi
 
 	# previous song button is pressed
-	if [[ $(cat /sys/class/gpio/gpio6/value) -eq 1 ]]
+	if [[ $(cat /sys/class/gpio/gpio6/value) -eq 1 ]] || [[ "$prev_button" -eq 1 ]]
 	then
 		# end any running process 
 		killall -15 play
@@ -218,48 +156,15 @@ do
 		play -q $next_song &
 		# make sure that the pause_play_flag is cleared
 		pause_play_flag=0
-		# this only for debugging 
-		echo "prevsong= $next_song" >> /myApplications/debug.txt
-		echo "prevcount= $song_count" >> /myApplications/debug.txt
-		# to avoid button debouncing 
-		sleep 0.5
-
-	elif [[ "$prev_button" -eq 1 ]]
-	then
-		# end any running process 
-		killall -15 play
-		if [[ $song_count -gt 1 ]]
-		then
-			# decrementing the song_count to select the next song in songsList.txt
-			song_count=$((song_count-1))
-			# pick the song name from the list to be played according to the song_count value
-			next_song=`sed -n "$song_count{p;q}" /myApplications/songsList.txt`			
-			# this only for debugging 
-			echo "prevsongIf= $next_song" >> /myApplications/debug.txt
-			echo "prevcountIf= $song_count" >> /myApplications/debug.txt
-		else
-			# reset the song_count to start the list from the last song  
-			song_count=$total_songs_num
-			# pick the song name from the list to be played according to the song_count value
-			next_song=`sed -n "$song_count{p;q}" /myApplications/songsList.txt`			
-			# this only for debugging 
-			echo "prevsongElse= $next_song" >> /myApplications/debug.txt
-			echo "prevcountElse= $song_count" >> /myApplications/debug.txt
-		fi	
-		# run the song in the background
-		play -q $next_song &
-		# make sure that the pause_play_flag is cleared
-		pause_play_flag=0
-		# this only for debugging 
-		echo "prevsong= $next_song" >> /myApplications/debug.txt
-		echo "prevcount= $song_count" >> /myApplications/debug.txt
 		echo "0" > /myApplications/prev_button.txt
+		# this only for displaying songs name	
+		echo "MP3 Playing > $next_song" > /myApplications/song_status.txt
 		# to avoid button debouncing 
 		sleep 0.5
 	fi
 
 	# shuffle button is pressed
-	if [[ $(cat /sys/class/gpio/gpio16/value) -eq 1 ]]
+	if [[ $(cat /sys/class/gpio/gpio16/value) -eq 1 ]] || [[ "$shuffle_button" -eq 1 ]]
 	then
 		random_song=$((RANDOM%total_songs_num+1))			
 		next_song=`sed -n "$random_song{p;q}" /myApplications/songsList.txt`
@@ -268,27 +173,13 @@ do
 		play -q $next_song &
 		# make sure that the pause_play_flag is cleared
 		pause_play_flag=0
-		# this only for debugging
-		echo "startsong= $next_song" >> /myApplications/debug.txt
-		echo "startcount= $song_count" >> /myApplications/debug.txt
+		# this only for displaying songs name	
+		echo "MP3 Playing > $next_song" > /myApplications/song_status.txt
+		# resetting the flag
 		shuffle_button=0
-		# to avoid button debouncing 
-		sleep 0.5
-	elif [[ "$shuffle_button" -eq 1 ]]
-	then
-		random_song=$((RANDOM%total_songs_num+1))			
-		next_song=`sed -n "$random_song{p;q}" /myApplications/songsList.txt`			
-		# end any running process 
-		killall -15 play
-		play -q $next_song &
-		# make sure that the pause_play_flag is cleared
-		pause_play_flag=0
-		# this only for debugging
-		echo "startsong= $next_song" >> /myApplications/debug.txt
-		echo "startcount= $song_count" >> /myApplications/debug.txt
-		shuffle_button=0
-		# to avoid button debouncing 
-		sleep 0.5
 		echo "0" > /myApplications/shuffle_button.txt
+		# to avoid button debouncing 
+		sleep 0.5
 	fi
+	
 done
