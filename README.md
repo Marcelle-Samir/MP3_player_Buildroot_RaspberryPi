@@ -1,15 +1,21 @@
 # mp3 player (music box) 
 
-using RaspberryPi 3 B+, customized Buildroot image, 
-and 4 mechanical push buttons
+using RaspberryPi 3 B+, customized Buildroot image, \
+you can control your music player through 4 mechanical push buttons:
 >pause/play button\
 >shuffle button\
 >previous button\
 >next button
 
-the voice can be over:
+or by typing on terminal:
+>Play
+>pause
+>next
+>previous
+>shuffle
 
->bluetooth speakers\
+the voice can be over:
+>bluetooth speakers (to connect type connect on the terminal) \
 >HDMI\
 >wired speakers
 
@@ -37,4 +43,6 @@ To view and edit the configuration one by one we will use the menuconfig:
 
 <img src="images/openssh.png" width="500">
 
+You can start the build simply by typing make command, or to collect some information about our build in order to use them later for debugging if the build failed use:
+>time make 2>&1 | tee build.log
 
