@@ -82,6 +82,33 @@ seperate between them using space.
 
 <img src="images/pulseaudio.png" width="500">
 
+## Target packages  --->  Libraries  --->  Audio/Sound
+
+- select alsa-lib and all packages in it, also select bcg729
+
+<img src="images/alsalib.png" width="500">
+
+- also select libmad, and Architecture-specific optimizations, also libid3tag
+
+<img src="images/libmad.png" width="500">
+
+- also select sbc, portaudio alsa support and c++ binding
+
+<img src="images/sbc.png" width="500">
+
+##  Target packages  --->  Hardware handling
+
+- from Firmware, select b43-firmware, rpi-firmware, and rpi-wifi-firmware
+
+<img src="images/firmware.png" width="500">
+
+- and select dbus, dbus-glib, and eudev -> enable hwdb installation
+
+<img src="images/dbus.png" width="500">
+
+- also select rpi-userland and the 2 options in it
+
+<img src="images/userland.png" width="500">
 
 
 You can start the build simply by typing make command, or to collect some information about our build in order to use them later for debugging if the build failed use:
