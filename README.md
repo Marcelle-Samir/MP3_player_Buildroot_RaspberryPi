@@ -19,7 +19,8 @@ the voice can be over:
 >HDMI\
 >wired speakers
 
-Note: bluetooth speaker is highest priority and wired speaker is the lowest you can chane the priority by editing output_selector.sh script.
+Note: bluetooth speaker is highest priority and wired speaker is the lowest you can chane the priority by editing output_selector.sh script.\
+also we have espeek it talks if new USB device is added or a USB is removed
 
 you can access RaspberryPi terminal through 
 >Ethernet\
