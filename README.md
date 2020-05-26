@@ -8,10 +8,10 @@ you can control your music player through 4 mechanical push buttons:
 >next button
 
 or by typing on terminal:
->Play
->pause
->next
->previous
+>Play\
+>pause\
+>next\
+>previous\
 >shuffle
 
 the voice can be over:
@@ -39,9 +39,50 @@ Apply the default configuration for our raspberry pi:
 To view and edit the configuration one by one we will use the menuconfig:
 >make menuconfig
 
+- select glibc
+
+<img src="images/glibc.png" width="500">
+
+- change image size
+
+<img src="images/size.png" width="500">
+
+- add root password here, and also select "Enable root login with password"    
+
+<img src="images/password.png" width="500">
+
+- change dev manager
+
+<img src="images/dev.png" width="500">
+
+- add your postbuild scripts here after putting them in board/raspberrypi3 directory in build root files,\
+seperate between them using space.
+
+<img src="images/postbuild.png" width="500">
+
+- add your overlay source directory here
+
+<img src="images/overlay.png" width="500">
+
 - We need to add support for ssh in our image
 
 <img src="images/openssh.png" width="500">
+
+## Target packages  --->  Audio and video applications
+
+- select alsa utils and all packages in it
+
+<img src="images/alsautils.png" width="500">
+
+- also select atest, aumix, espeak, ffmpeg, jack1
+
+<img src="images/alsa.png" width="500">
+
+- also select pulseaudio, sox
+
+<img src="images/pulseaudio.png" width="500">
+
+
 
 You can start the build simply by typing make command, or to collect some information about our build in order to use them later for debugging if the build failed use:
 >time make 2>&1 | tee build.log
