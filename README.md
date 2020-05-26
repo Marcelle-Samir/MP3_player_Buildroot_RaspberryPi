@@ -64,10 +64,6 @@ seperate between them using space.
 
 <img src="images/overlay.png" width="500">
 
-- We need to add support for ssh in our image
-
-<img src="images/openssh.png" width="500">
-
 ## Target packages  --->  Audio and video applications
 
 - select alsa utils and all packages in it
@@ -110,6 +106,23 @@ seperate between them using space.
 
 <img src="images/userland.png" width="500">
 
+## Target packages  --->  Networking applications
+
+- select Bluez-tools, and Bluez-utils 5x and all options in it
+
+<img src="images/bluez.png" width="500">
+
+- select ifupdown scripts
+
+<img src="images/updown.png" width="500">
+
+- We need to add support for ssh in our image
+
+<img src="images/openssh.png" width="500">
+
+- also select wpa-supplicant and in it select autoscan and wpa_passphrase
+
+<img src="images/wpa.png" width="500">
 
 You can start the build simply by typing make command, or to collect some information about our build in order to use them later for debugging if the build failed use:
 >time make 2>&1 | tee build.log
